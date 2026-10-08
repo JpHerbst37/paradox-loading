@@ -30,9 +30,10 @@ PUT IT ONLINE (about 10 minutes, once)
 
    (YOURNAME = your GitHub name.) Open it in a browser to check.
 
-5. On the game server, in garrysmod/cfg/server.cfg, add this line:
-
-       sv_loadingurl "https://YOURNAME.github.io/paradox-loading/"
+5. The server addon 1rploading points the server at the page for you
+   (https://jpherbst37.github.io/paradox-loading/). Nothing to put in
+   server.cfg. To move the page, change URL in
+   1rploading/lua/autorun/server/rploading.lua.
 
 6. Restart the server. Join, and you will see it.
 
@@ -65,13 +66,28 @@ top of your picture.
 THE MUSIC
 ---------
 
-"4 Hours of Post Apocalyptic Acoustic Guitar (S.T.A.L.K.E.R./Metro Inspired with
-campfire ambience)" by Joe Mathews, played with YouTube's own player in the
-AUDIO LOG window. YouTube's rules say its player must be shown, not hidden,
-so it stays visible. It starts at a random point in the four hours each time.
+No YouTube (its player plays adverts nobody can skip). The music is a plain file
+in this folder:
 
-If the video is ever removed or embedding is switched off, the window simply
-disappears and the page carries on without music.
+1. Put an .mp3 or .ogg next to index.html, e.g. music.mp3 -- UNDER 25 MB
+   (GitHub's upload page refuses bigger files; about 20 minutes of music).
+2. In config.js set:   MUSIC_FILE: "music.mp3",   and MUSIC_CREDIT for the name.
+3. Upload the music file and config.js.
+
+It fades in, loops, and starts somewhere random in the track each time.
+
+Use music you are allowed to put on a website: your own, a track the artist
+said yes to, or one with a free licence. A ripped track can get the whole page
+taken down.
+
+
+UPDATING THE WEBSITE
+--------------------
+
+1. Open github.com/jpherbst37/paradox-loading
+2. Add file > Upload files.
+3. Drag in the files you changed. A file with the same name replaces the old one.
+4. Commit changes. The page updates in about a minute.
 
 
 PREVIEW IT ON YOUR PC

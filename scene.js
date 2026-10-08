@@ -1128,6 +1128,99 @@ var Scene = (function () {
 		ctx.restore();
 	}
 
+	/*
+		FIREFLIES, for a night picture: dark most of the time, then a slow
+		swell of light and out again, each on its own clock, wandering lazily
+		through the lower part of the jungle. Most are a green-gold; a few
+		take the cyan of the glowing plants. Four drift right past the lens,
+		big and out of focus. Screen space.
+	*/
+	var nightFlies = [];
+
+	function drawFireflies(t, dt) {
+		if (!nightFlies.length) {
+			for (var i = 0; i < 46; i++) {
+				var near = i < 4;
+
+				nightFlies.push({
+					x: Math.random(), y: 0.35 + Math.random() * 0.6,
+					vx: (Math.random() - 0.5) * 0.02, vy: (Math.random() - 0.5) * 0.01,
+					r: near ? 0.02 + Math.random() * 0.025 : 0.0022 + Math.random() * 0.0028,
+					phase: Math.random() * 20, rate: 0.22 + Math.random() * 0.33,
+					near: near, cyan: Math.random() < 0.3
+				});
+			}
+		}
+
+		ctx.save();
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.globalCompositeOperation = "lighter";
+
+		for (var k = 0; k < nightFlies.length; k++) {
+			var f = nightFlies[k];
+
+			f.x += (f.vx + Math.sin(t * 0.37 + f.phase) * 0.008) * dt;
+			f.y += (f.vy + Math.cos(t * 0.29 + f.phase * 1.3) * 0.005) * dt;
+
+			if (f.x < -0.05) f.x = 1.05;
+			if (f.x > 1.05) f.x = -0.05;
+			if (f.y < 0.28) f.vy = Math.abs(f.vy);
+			if (f.y > 1.0) f.vy = -Math.abs(f.vy);
+
+			var cycle = (t * f.rate + f.phase) % 1;
+
+			var glow = 0.06 + 0.94 * (cycle < 0.35 ? Math.sin(cycle / 0.35 * Math.PI) : 0);
+
+			var x = f.x * cw, y = f.y * ch;
+
+			var r = f.near ? f.r * ch : f.r * ch * 4 * (0.8 + glow * 0.5);
+
+			var a = f.near ? 0.02 + 0.06 * glow : 0.9 * glow;
+
+			var rgb = f.cyan ? "150,255,238" : "210,255,140";
+
+			var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+
+			g.addColorStop(0, "rgba(" + rgb + "," + a + ")");
+			g.addColorStop(f.near ? 0.7 : 0.22, "rgba(" + rgb + "," + (a * 0.45) + ")");
+			g.addColorStop(1, "rgba(" + rgb + ",0)");
+
+			ctx.fillStyle = g;
+			ctx.fillRect(x - r, y - r, r * 2, r * 2);
+		}
+
+		ctx.restore();
+	}
+
+	/* mist creeping along the ground in a few long, slow banks */
+	function drawMist(t) {
+		ctx.save();
+
+		for (var i = 0; i < 3; i++) {
+			var y = ch * (0.66 + i * 0.12);
+
+			var drift = ((t * (0.005 + i * 0.003) + i * 0.37) % 2) - 0.5;
+
+			for (var copy = -1; copy <= 1; copy++) {
+				var x = cw * (drift + copy * 2);
+
+				ctx.setTransform(1, 0, 0, 0.26, x, y);
+
+				var r = cw * 0.6;
+
+				var g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+
+				g.addColorStop(0, "rgba(170,190,205," + (0.075 - i * 0.017) + ")");
+				g.addColorStop(1, "rgba(170,190,205,0)");
+
+				ctx.fillStyle = g;
+				ctx.fillRect(-r, -r, r * 2, r * 2);
+			}
+		}
+
+		ctx.restore();
+	}
+
 	/* embers and dust drifting right past the lens: big, soft, out of focus */
 	var bokeh = [];
 
@@ -1296,7 +1389,15 @@ var Scene = (function () {
 		var swayX = Math.sin(t * 0.37) * 6 + Math.sin(t * 1.1) * 1.5;
 		var swayY = Math.sin(t * 0.52) * 4 + Math.sin(t * 1.7) * 1.2;
 
+		/*
+			A CLEAN SLATE EVERY FRAME. If anything drawn last frame stopped half
+			way (an error between a save and its restore), the canvas would be
+			left adding light instead of painting -- and the picture would wash
+			out to white a frame at a time. So the mode is put back here, always.
+		*/
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.globalCompositeOperation = "source-over";
+		ctx.globalAlpha = 1;
 		ctx.fillStyle = "#000";
 		ctx.fillRect(0, 0, cw, ch);
 
@@ -1316,13 +1417,26 @@ var Scene = (function () {
 
 			ctx.drawImage(photo, (cw - pw) / 2 + swayX * 0.6 + panX, (ch - ph) / 2 + swayY * 0.6 + panY, pw, ph);
 
-			var sunX = cw * (LOADING.SUN_X || 0.84), sunY = ch * (LOADING.SUN_Y || 0.2);
+			/*
+				THE LIGHT IN THE PICTURE, breathing: a gold haze for a sunset,
+				a pale cold one for a night under the moon (LIGHT in config.js).
+			*/
+			var moon = LOADING.LIGHT === "moon";
 
-			var haze = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, ch * 0.95);
+			var lightX = cw * (LOADING.LIGHT_X != null ? LOADING.LIGHT_X : (LOADING.SUN_X || 0.84));
+			var lightY = ch * (LOADING.LIGHT_Y != null ? LOADING.LIGHT_Y : (LOADING.SUN_Y || 0.2));
 
-			haze.addColorStop(0, "rgba(255,196,120," + (0.12 + 0.05 * Math.sin(t * 0.55)) + ")");
-			haze.addColorStop(0.5, "rgba(255,170,90," + (0.04 + 0.02 * Math.sin(t * 0.55)) + ")");
-			haze.addColorStop(1, "rgba(255,170,90,0)");
+			var haze = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, ch * 0.95);
+
+			if (moon) {
+				haze.addColorStop(0, "rgba(180,205,255," + (0.08 + 0.03 * Math.sin(t * 0.4)) + ")");
+				haze.addColorStop(0.5, "rgba(140,170,230," + (0.025 + 0.01 * Math.sin(t * 0.4)) + ")");
+				haze.addColorStop(1, "rgba(140,170,230,0)");
+			} else {
+				haze.addColorStop(0, "rgba(255,196,120," + (0.12 + 0.05 * Math.sin(t * 0.55)) + ")");
+				haze.addColorStop(0.5, "rgba(255,170,90," + (0.04 + 0.02 * Math.sin(t * 0.55)) + ")");
+				haze.addColorStop(1, "rgba(255,170,90,0)");
+			}
 
 			ctx.save();
 			ctx.globalCompositeOperation = "lighter";
@@ -1330,7 +1444,13 @@ var Scene = (function () {
 			ctx.fillRect(0, 0, cw, ch);
 			ctx.restore();
 
-			drawDust(t, dt);
+			if (LOADING.MIST) drawMist(t);
+
+			if (moon && LOADING.FIREFLIES !== false) {
+				drawFireflies(t, dt);
+			} else {
+				drawDust(t, dt);
+			}
 		} else if (wantPhoto) {
 			/* the picture is still on its way: dark until it arrives */
 		} else {

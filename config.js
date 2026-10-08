@@ -2,10 +2,12 @@
    PARADOXVRP LOADING SCREEN -- SETTINGS
 
    This folder is a WEB PAGE, not a Garry's Mod addon. Do not upload it to the
-   server's addons. It goes on GitHub Pages (see README.txt), and the server's
-   server.cfg points at it:   sv_loadingurl "https://YOURNAME.github.io/paradox-loading/"
+   server's addons. It lives on GitHub Pages:
+       https://jpherbst37.github.io/paradox-loading/
+   and the server addon 1rploading points the server at it.
 
-   Change anything below, save, and upload the file again.
+   Change anything below, save, and upload this file to GitHub again
+   (Add file > Upload files -- a file with the same name is replaced).
    ============================================================================ */
 
 var LOADING = {
@@ -26,40 +28,57 @@ var LOADING = {
 	LOCATION: "WASSKAH  //  KASHYYYK SYSTEM",
 
 	/*
-		YOUR OWN PICTURE INSTEAD OF THE PAINTED SCENE. Put a PNG or JPG in this
-		folder and write its file name here, e.g. "campfire.png". Leave it "" to
-		keep the painted, moving scene. Best at 1920 x 1080.
+		THE PICTURE. Put a PNG or JPG in this folder and write its file name
+		here. Leave it "" for the painted, moving scene. Best at 1920 x 1080.
 	*/
 	SCENE_IMAGE: "clone.jpg",
 
-	/* where the sun is in the picture (0 to 1 across, 0 to 1 down), for the haze */
-	SUN_X: 0.84,
-	SUN_Y: 0.2,
+	/*
+		THE LIGHT IN THE PICTURE, for the glow laid over it:
+		  "moon"  cold and pale -- a night picture (the jungle one)
+		  "sun"   warm and gold -- a sunset picture
+		LIGHT_X / LIGHT_Y say where it is (0 to 1 across, 0 to 1 down).
+	*/
+	LIGHT: "moon",
+	LIGHT_X: 0.86,
+	LIGHT_Y: 0.04,
+
+	/* fireflies drifting through the dark, and mist creeping along the ground */
+	FIREFLIES: true,
+	MIST: true,
 
 	/*
-		THE MUSIC: "4 Hours of Post Apocalyptic Acoustic Guitar (S.T.A.L.K.E.R./Metro
-		Inspired with campfire ambience)" by Joe Mathews, played through YouTube's own
-		player in the AUDIO LOG window (YouTube only allows its player to be shown,
-		not hidden). It starts somewhere random in the four hours each time.
-		Set MUSIC to false for silence.
+		THE MUSIC: a music file in this folder -- an .mp3 or .ogg -- played as
+		the "audio log". Put the file next to index.html and write its name
+		here, e.g. "music.mp3". Leave it "" for silence.
+
+		Keep it under 25 MB (GitHub's upload page refuses bigger files): about
+		20 minutes of music at normal quality. It loops, and starts somewhere
+		random in the track each time.
+
+		USE MUSIC YOU ARE ALLOWED TO PUT ON A WEBSITE -- a track you made, one
+		the artist said yes to, or one with a free licence. A ripped track can
+		get the whole page taken down.
 	*/
 	MUSIC: true,
+	MUSIC_FILE: "",
 	MUSIC_VOLUME: 0.6,
-
-	YOUTUBE_ID: "i2VjesyosKM",
-	YOUTUBE_SECONDS: 14400,
-	YOUTUBE_CREDIT: "JOE MATHEWS  --  POST APOCALYPTIC ACOUSTIC GUITAR",
+	MUSIC_RANDOM_START: true,
+	MUSIC_CREDIT: "",
 
 	/* Turned every few seconds at the bottom of the screen. */
 	TIPS: [
 		"F4 opens your datapad. Everything you need is in there.",
+		"New here? Open TUTORIAL from the main menu.",
+		"F1 opens the field manual: controls, commands, rules and guides.",
 		"Lost? Ask in /ooc or call a staff member from F4.",
 		"Hold R with your hands empty to open the emote wheel.",
 		"Right click on the death screen to pick where you redeploy.",
 		"Fortify: left click a blueprint with the pad to build it.",
 		"Ammunition and medical crates refill with PACK THE CRATE.",
 		"Stay in character. The Republic is watching.",
-		"Medals buy commendations in the armoury.",
+		"Medals unlock warbonds in the armoury.",
+		"File operation reports to earn medals.",
 		"Combat Engineers build the dispenser. Pack crates to fill it.",
 		"Respect your officers. Earn your rank.",
 		"Never leave a brother behind.",
